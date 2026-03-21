@@ -23,7 +23,7 @@ jobs:
     - name: Run Semgrep (SAST)
       run:  |
         pip install semgrep
-        semgrep --config=auto .
+        semgrep --config=auto  --error .
 
     - name: Run basic test
       run: echo "App build successful"
