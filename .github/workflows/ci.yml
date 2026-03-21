@@ -24,6 +24,10 @@ jobs:
       run:  |
         pip install semgrep
         semgrep --config=auto  --error .
+      
+    - name: Run Gitleaks (Secrets Scan)
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/repo zricethezav/gitleaks detect --source /repo --exit-code 1
 
     - name: Run basic test
       run: echo "App build successful"
