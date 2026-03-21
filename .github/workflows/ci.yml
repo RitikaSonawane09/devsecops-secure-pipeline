@@ -20,5 +20,10 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
+    - name: Run Semgrep (SAST)
+      run:  |
+        pip install semgrep
+        semgrep --config=auto .
+
     - name: Run basic test
       run: echo "App build successful"
