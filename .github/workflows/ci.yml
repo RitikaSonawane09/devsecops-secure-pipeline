@@ -65,14 +65,14 @@ jobs:
     - name: Run OWASP ZAP Scan
       continue-on-error: true
       run: |
-         chmod -R 777 $(pwd)
-         docker run --rm --network host \
-         -v $(pwd):/zap/wrk \
-         ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-         -t http://localhost:5000 \
-         -m 2 \
-         -I \
-         -r /zap/wrk/zap-report.html || true
+        chmod -R 777 $(pwd)
+        docker run --rm --network host \
+        -v $(pwd):/zap/wrk \
+        ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+        -t http://localhost:5000 \
+        -m 2 \
+        -I \
+        -r zap-report.html || true
 
     #  Debug (check file exists)
     - name: List files (debug)
