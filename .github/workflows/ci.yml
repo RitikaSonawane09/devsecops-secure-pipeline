@@ -60,11 +60,14 @@ jobs:
     - name: Run OWASP ZAP Scan
       continue-on-error: true
       run: |
-        docker run --rm -t \
+        docker run --rm -t --network host \
           -v ${{ github.workspace }}:/zap/wrk \
           owasp/zap2docker-stable zap-baseline.py \
-          -t http://host.docker.internal:5000 \
-          -r zap-report.html
+          -t http://localhost:5000 \
+          -r zap-report.html || true
+
+    - name: List files (debug)
+      run: ls -la
 
     #  Upload ZAP Report
     - name: Upload ZAP Report
@@ -72,8 +75,11 @@ jobs:
       with:
         name: zap-report
         path: zap-report.html
-
-    #  Cleanup
+   
+    - name: List files (debug)
+      run: ls -la
+   
+      #  Cleanup
     - name: Stop and remove container
       run: |
         docker stop test-app
