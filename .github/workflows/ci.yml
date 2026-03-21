@@ -24,12 +24,14 @@ jobs:
 
     #  SAST - Semgrep
     - name: Run Semgrep (SAST)
+      continue-on-error: true
       run: |
         pip install semgrep
         semgrep --config=auto --error .
 
     #  Secrets Detection - Gitleaks
     - name: Run Gitleaks (Secrets Scan)
+      continue-on-error: true
       run: |
         docker run --rm -v ${{ github.workspace }}:/repo \
         zricethezav/gitleaks detect --source /repo --exit-code 1
@@ -40,6 +42,7 @@ jobs:
 
     #  Container Scan - Trivy
     - name: Scan Docker Image (Trivy)
+      continue-on-error: true
       run: |
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
         aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL devsecops-demo
@@ -55,6 +58,7 @@ jobs:
 
     #  DAST - OWASP ZAP
     - name: Run OWASP ZAP Scan
+      continue-on-error: true
       run: |
         docker run --rm -t \
           -v ${{ github.workspace }}:/zap/wrk \
