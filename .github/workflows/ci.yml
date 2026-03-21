@@ -67,6 +67,8 @@ jobs:
           -v $(pwd):/zap/wrk \
           ghcr.io/zaproxy/zaproxy:stable
           -t http://localhost:5000 \
+          -m 2 \
+          -I \
           -r zap-report.html || true
 
     - name: List files (debug)
