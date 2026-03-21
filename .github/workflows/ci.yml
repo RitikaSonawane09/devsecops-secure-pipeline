@@ -12,30 +12,69 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # 🐍 Setup Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
 
+    #  Install dependencies
     - name: Install dependencies
       run: pip install -r requirements.txt
 
+    #  SAST - Semgrep
     - name: Run Semgrep (SAST)
-      run:  |
+      run: |
         pip install semgrep
-        semgrep --config=auto  --error .
-      
+        semgrep --config=auto --error .
+
+    #  Secrets Detection - Gitleaks
     - name: Run Gitleaks (Secrets Scan)
       run: |
-        docker run --rm -v ${{ github.workspace }}:/repo zricethezav/gitleaks detect --source /repo --exit-code 1
-    
+        docker run --rm -v ${{ github.workspace }}:/repo \
+        zricethezav/gitleaks detect --source /repo --exit-code 1
+
+    #  Build Docker Image
     - name: Build Docker Image
       run: docker build -t devsecops-demo .
-  
+
+    #  Container Scan - Trivy
     - name: Scan Docker Image (Trivy)
       run: |
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
         aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL devsecops-demo
 
-    - name: Run basic test
-      run: echo "App build successful"
+    #  Run Application
+    - name: Run Application Container
+      run: |
+        docker run -d -p 5000:5000 --name test-app devsecops-demo
+
+    #  Wait for app
+    - name: Wait for app to be ready
+      run: sleep 15
+
+    #  DAST - OWASP ZAP
+    - name: Run OWASP ZAP Scan
+      run: |
+        docker run --rm -t \
+          -v ${{ github.workspace }}:/zap/wrk \
+          owasp/zap2docker-stable zap-baseline.py \
+          -t http://host.docker.internal:5000 \
+          -r zap-report.html
+
+    #  Upload ZAP Report
+    - name: Upload ZAP Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: zap-report
+        path: zap-report.html
+
+    #  Cleanup
+    - name: Stop and remove container
+      run: |
+        docker stop test-app
+        docker rm test-app
+
+    #  Final message
+    - name: Build Success Message
+      run: echo "All security checks passed"
