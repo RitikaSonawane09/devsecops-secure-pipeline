@@ -12,7 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 🐍 Setup Python
+    #  Setup Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -47,7 +47,7 @@ jobs:
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
         aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL devsecops-demo
 
-    #  Run Application
+    # Run Application
     - name: Run Application Container
       run: |
         docker run -d -p 5000:5000 --name test-app devsecops-demo
@@ -55,22 +55,25 @@ jobs:
     #  Wait for app
     - name: Wait for app to be ready
       run: sleep 15
+
+    #  Verify app
     - name: Verify app is running
       run: |
         curl http://localhost:5000 || true
 
-    #  DAST - OWASP ZAP
+    #  DAST - OWASP ZAP (FIXED)
     - name: Run OWASP ZAP Scan
       continue-on-error: true
       run: |
-        docker run --rm -t --network host \
+        docker run --rm --network host \
           -v $(pwd):/zap/wrk \
-          ghcr.io/zaproxy/zaproxy:stable
+          ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
           -t http://localhost:5000 \
           -m 2 \
           -I \
-          -r zap-report.html || true
+          -r /zap/wrk/zap-report.html || true
 
+    #  Debug (check file exists)
     - name: List files (debug)
       run: ls -la
 
@@ -80,11 +83,8 @@ jobs:
       with:
         name: zap-report
         path: zap-report.html
-   
-    - name: List files (debug)
-      run: ls -la
-   
-      #  Cleanup
+
+    #  Cleanup
     - name: Stop and remove container
       run: |
         docker stop test-app
@@ -92,4 +92,4 @@ jobs:
 
     #  Final message
     - name: Build Success Message
-      run: echo "All security checks passed"
+      run: echo "All security checks completed"
