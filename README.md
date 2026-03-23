@@ -74,7 +74,7 @@ These findings highlight common misconfigurations in early-stage applications.
 ![ZAP Report](Images/ZAP-report.png)
 
 - Failing security checks
-[Failing Security Checks](Images/Failing Security Checks.png)
+[Failing Security Checks](Images/Failing_Security_Checks.png)
 ---
 
 ##  Note
