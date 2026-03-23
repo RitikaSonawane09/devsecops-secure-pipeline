@@ -68,7 +68,7 @@ These findings highlight common misconfigurations in early-stage applications.
 
 
 - GitHub Actions pipeline
-![Pipeline](Images/Pipeline.png.)
+![Pipeline](Images/Pipeline.png)
 
 - ZAP report
 ![ZAP Report](Images/ZAP-report.png)
